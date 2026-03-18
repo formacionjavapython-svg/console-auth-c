@@ -1,5 +1,4 @@
-*.class
-/bin/
-.settings/
-.project
-.classpath
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
