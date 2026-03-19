@@ -1,0 +1,35 @@
+name: "Análisis de Seguridad CodeQL"
+
+on:
+  push:
+    branches: [ "C29" ]
+  pull_request:
+    branches: [ "C29" ]
+  schedule:
+    - cron: '30 0 * * 1' # sejecuta cada lunes a las 00:30
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'java'
+
+      - name: Build Manual (Compilar)
+        run: |
+          mkdir -p out
+          javac -d out src/main/java/model/*.java src/main/java/service/*.java src/main/java/*.java
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

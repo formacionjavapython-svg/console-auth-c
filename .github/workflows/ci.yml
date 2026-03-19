@@ -31,3 +31,15 @@ jobs:
       - name: Correr Checkstyle
         run: |
           java -jar lib/checkstyle-*-all.jar -c checkstyle.xml src/
+
+      # 6
+      - name: Ejecutar TestRunner y Guardar Reporte
+        run: |
+          java -cp out test.java.TestRunner > test-report-c29miguelruiz.txt
+
+      # 7
+      - name: Subir Reporte de Pruebas
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-autenticacion
+          path: test-report-c29miguelruiz.txt
