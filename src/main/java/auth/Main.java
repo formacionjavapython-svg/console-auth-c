@@ -1,3 +1,5 @@
+package auth;
+import auth.service.AuthService;
 import java.util.Scanner;
 
 public class Main {
@@ -13,7 +15,8 @@ public class Main {
             int option = sc.nextInt();
             sc.nextLine();
 
-            if (option == 1) {
+
+             if (option == 1) {
                 System.out.print("Email: ");
                 String email = sc.nextLine();
 

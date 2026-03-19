@@ -1,3 +1,5 @@
+package auth.repository;
+import auth.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,7 @@ public class UserRepository {
 
     public User findByEmail(String email) {
         for (User u : users) {
-            if (u.email.equals(email)) {
+            if (u.getEmail().equals(email)) {
                 return u;
             }
         }

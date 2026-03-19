@@ -1,0 +1,26 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Compilar
+        run: javac -d out src/main/java/auth/**/*.java
+
+      - name: Compilar tests
+        run: javac -cp out -d out src/test/java/auth/*.java
+
+      - name: Ejecutar tests
+        run: java -cp out auth.TestRunner
