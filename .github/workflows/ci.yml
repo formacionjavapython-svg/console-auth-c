@@ -1,5 +1,5 @@
 name: CI
-C38-Tania-Mendez
+#C38-Tania-Mendez
 
 on: [push, pull_request]
 
@@ -45,4 +45,3 @@ jobs:
         run: javac src/main/java/*.java
       - name: Run Tests
         run: java -cp src/main/java AuthServiceTest
-        main
