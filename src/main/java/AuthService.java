@@ -20,6 +20,7 @@ public class AuthService {
         return Base64.getEncoder().encodeToString(hash);
     }
 
+    // NUEVO: Método para verificar si la contraseña ingresada es correcta
     public boolean verifyPassword(String inputPassword, String storedHash, byte[] salt) throws Exception {
         String newHash = hashPassword(inputPassword, salt);
         return newHash.equals(storedHash);

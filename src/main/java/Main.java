@@ -28,10 +28,12 @@ public class Main {
                     try {
                         byte[] salt = auth.generateSalt();
                         String hash = auth.hashPassword(pass, salt);
-                        database.add(new User(email, hash + ":" + Base64.getEncoder().encodeToString(salt)));
-                        System.out.println("[OK] Registrado.");
-                    } catch (Exception e) { System.out.println("Error."); }
-                } else { System.out.println("[!] Password débil."); }
+                        // Guardamos hash y salt juntos usando un separador ":"
+                        String savedData = hash + ":" + Base64.getEncoder().encodeToString(salt);
+                        database.add(new User(email, savedData));
+                        System.out.println("[OK] Usuario registrado correctamente.");
+                    } catch (Exception e) { System.out.println("[!] Error de seguridad."); }
+                } else { System.out.println("[!] Password muy débil."); }
 
             } else if (op == 2) {
                 System.out.print("Email: ");
@@ -39,23 +41,26 @@ public class Main {
                 System.out.print("Password: ");
                 String pass = sc.nextLine();
                 
-                boolean found = false;
+                boolean encontrado = false;
                 for (User u : database) {
                     if (u.getEmail().equals(email)) {
                         try {
                             String[] parts = u.getPasswordHash().split(":");
                             byte[] salt = Base64.getDecoder().decode(parts[1]);
                             if (auth.verifyPassword(pass, parts[0], salt)) {
-                                System.out.println("[BIENVENIDO] Acceso concedido.");
+                                System.out.println("\n[BIENVENIDO] ¡Acceso concedido!");
                             } else {
-                                System.out.println("[ERROR] Credenciales inválidas.");
+                                System.out.println("\n[ERROR] Contraseña incorrecta.");
                             }
-                            found = true;
-                        } catch (Exception e) { System.out.println("Error."); }
+                            encontrado = true;
+                        } catch (Exception e) { System.out.println("[!] Error al validar."); }
                     }
                 }
-                if (!found) System.out.println("[ERROR] Usuario no existe.");
-            } else if (op == 3) break;
+                if (!encontrado) System.out.println("\n[ERROR] El usuario no existe.");
+            } else if (op == 3) {
+                System.out.println("Saliendo del sistema...");
+                break;
+            }
         }
     }
 }
