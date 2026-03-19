@@ -80,8 +80,7 @@ public class ConsoleApp {
         } else {
             System.out.println("\nError en el registro:");
             System.out.println("- El email puede ser inválido o ya estar registrado");
-            System.out.println("- La contraseña debe tener mínimo 8 caracteres");
-            System.out.println("- Debe incluir al menos una mayúscula, una minúscula y un número");
+            System.out.println("- La contraseña no cumple con las políticas de seguridad");
         }
     }
     
