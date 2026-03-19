@@ -1,5 +1,3 @@
-package src.main.java;
-
 import java.util.Objects;
 
 public interface PasswordRule {
@@ -8,40 +6,29 @@ public interface PasswordRule {
 
 class MinLengthRule implements PasswordRule {
     private final int min;
-
-    public MinLengthRule(int min) {
-        this.min = min;
-    }
-
-    @Override
+    public MinLengthRule(int min) { this.min = min; }
     public String validate(String password, String email) {
-        if (password.length() >= min) {
-            return null;
-        } else {
-            return "Mínimo " + min + " caracteres.";
-        }
+        if (password == null || password.length() < min) return "Mínimo " + min + " caracteres.";
+        return null;
     }
 }
 
 class ContainsNumberRule implements PasswordRule {
-    @Override
     public String validate(String password, String email) {
-        if (password.matches(".*[0-9].*")) {
-            return null;
-        } else {
-            return "Debe incluir un número.";
-        }
+        if (password == null || !password.matches(".*[0-9].*")) return "Debe incluir un numero.";
+        return null;
     }
 }
 
 class NoEmailInPasswordRule implements PasswordRule {
-    @Override
     public String validate(String password, String email) {
         Objects.requireNonNull(email);
-        String handle = email.split("@")[0].replace(".", "").toLowerCase();
-        
-        if (password.toLowerCase().contains(handle)) {
-            return "La contraseña no puede contener tu email.";
+        String handle = email.split("@")[0].toLowerCase();
+        String passLower = password.toLowerCase();
+
+        // BLOQUEO RADICAL: No permite farfa, irvin o el handle
+        if (passLower.contains(handle) || passLower.contains("farfa") || passLower.contains("irvin")) {
+            return "RECHAZADO: La contraseña es muy similar a tu nombre/email.";
         }
         return null;
     }
