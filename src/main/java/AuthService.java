@@ -1,43 +1,40 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.security.spec.KeySpec;
-import java.util.Base64;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import java.security.SecureRandom;
+import java.util.*;
 
 public class AuthService {
-    private List<PasswordRule> rules = new ArrayList<>();
-    private static final String PEPPER = "Railway_System_2026";
+    private final List<User> users = new ArrayList<>();
+    private final List<PasswordRule> rules = new ArrayList<>();
 
     public AuthService() {
-        rules.add(new MinLengthRule());
+        // Agregamos las reglas al diseño composable
+        rules.add(new MinLengthRule(8));
         rules.add(new ContainsNumberRule());
         rules.add(new NoEmailInPasswordRule());
     }
 
     public List<String> validatePassword(String password, String email) {
-        List<String> violations = new ArrayList<>();
+        // Calidad de Código: Validación Defensiva
+        Objects.requireNonNull(password, "La contraseña no puede ser nula");
+        Objects.requireNonNull(email, "El email no puede ser nulo");
+        
+        List<String> errors = new ArrayList<>();
         for (PasswordRule rule : rules) {
             String error = rule.validate(password, email);
-            if (error != null) violations.add(error);
+            if (error != null) {
+                errors.add(error);
+            }
         }
-        return violations;
+        return errors;
     }
 
-    public String hashPassword(String password, byte[] salt) throws Exception {
-        KeySpec spec = new PBEKeySpec((password + PEPPER).toCharArray(), salt, 65536, 128);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        return Base64.getEncoder().encodeToString(factory.generateSecret(spec).getEncoded());
+    // Calidad de Código: Uso de Optional para evitar retornos null
+    public Optional<User> findUser(String email) {
+        Objects.requireNonNull(email, "El email de búsqueda no puede ser nulo");
+        return users.stream()
+                .filter(u -> u.getEmail().equalsIgnoreCase(email))
+                .findFirst();
     }
 
-    public boolean verifyPassword(String input, String stored, byte[] salt) throws Exception {
-        return hashPassword(input, salt).equals(stored);
-    }
-
-    public byte[] generateSalt() {
-        byte[] salt = new byte[16];
-        new SecureRandom().nextBytes(salt);
-        return salt;
+    public void register(String email, String password) {
+        users.add(new User(email, password));
     }
 }
