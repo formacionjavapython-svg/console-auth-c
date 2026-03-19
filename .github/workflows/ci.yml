@@ -17,10 +17,10 @@ jobs:
           java-version: '17'
 
       - name: Compilar
-        run: javac -d out src/main/java/auth/**/*.java
+        run: find src/main/java -name "*.java" > sources.txt && javac -d out @sources.txt
 
       - name: Compilar tests
-        run: javac -cp out -d out src/test/java/auth/*.java
+        run: find src/test/java -name "*.java" > tests.txt && javac -cp out -d out @tests.txt
 
       - name: Ejecutar tests
         run: java -cp out auth.TestRunner
