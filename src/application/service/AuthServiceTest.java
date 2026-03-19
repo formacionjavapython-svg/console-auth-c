@@ -8,6 +8,8 @@ import util.PasswordUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import static application.dto.AuthStatus.*;
+
 public class AuthServiceTest {
 
     public static void main(String[] args) {
@@ -61,7 +63,7 @@ public class AuthServiceTest {
 
         AuthResponseDTO response = service.login(new LoginDTO(email, password));
 
-        assert response.getStatus() == AuthStatus.SUCCESS;
+        assert response.getStatus() == SUCCESS;
 
         repo.clearAll();
     }
@@ -76,7 +78,7 @@ public class AuthServiceTest {
                 new LoginDTO("no@user.com", "1234")
         );
 
-        assert response.getStatus() == AuthStatus.USER_NOT_FOUND;
+        assert response.getStatus() == USER_NOT_FOUND;
 
         repo.clearAll();
     }
@@ -94,7 +96,7 @@ public class AuthServiceTest {
                 new LoginDTO(email, "wrong")
         );
 
-        assert response.getStatus() == AuthStatus.INVALID_PASSWORD;
+        assert response.getStatus() == INVALID_PASSWORD;
 
         repo.clearAll();
     }
@@ -106,10 +108,10 @@ public class AuthServiceTest {
         AuthService service = new AuthService(repo);
 
         AuthResponseDTO response = service.register(
-                new RegisterDTO("new@test.com", "1234")
+                new RegisterDTO("new@test.com", "12345678")
         );
 
-        assert response.getStatus() == AuthStatus.SUCCESS;
+        assert response.getStatus() == SUCCESS;
 
         repo.clearAll();
     }
@@ -124,10 +126,10 @@ public class AuthServiceTest {
         AuthService service = new AuthService(repo);
 
         AuthResponseDTO response = service.register(
-                new RegisterDTO(email, "1234")
+                new RegisterDTO(email, "12345678910")
         );
 
-        assert response.getStatus() == AuthStatus.USER_ALREADY_EXISTS;
+        assert response.getStatus() == USER_ALREADY_EXISTS;
 
         repo.clearAll();
     }
@@ -140,7 +142,7 @@ public class AuthServiceTest {
                 new RegisterDTO("test@test.com", "123")
         );
 
-        assert response.getStatus() == AuthStatus.VALIDATION_ERROR;
+        assert response.getStatus() == VALIDATION_ERROR;
     }
 
     //EMAIL EN PASSWORD
@@ -152,6 +154,6 @@ public class AuthServiceTest {
                 new RegisterDTO("test@test.com", "test12345")
         );
 
-        assert response.getStatus() == AuthStatus.VALIDATION_ERROR;
+        assert response.getStatus() == VALIDATION_ERROR;
     }
 }
