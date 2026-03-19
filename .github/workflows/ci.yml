@@ -14,7 +14,10 @@ jobs:
           java-version: '17'
 
       - name: Compilar codigo
-        run: javac -d out src/**/*.java
+        run: |
+          mkdir -p out
+          find src -name "*.java" > sources.txt
+          javac -d out @sources.txt
 
       - name: Ejecutar pruebas
         run: java -cp out TestRunner
