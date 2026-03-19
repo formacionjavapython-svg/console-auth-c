@@ -1,0 +1,27 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Compilar
+        run: javac src/main/java/*.java
+
+      - name: Ejecutar tests
+        run: java -cp src/main/java TestRunner
+
+      - name: Descargar Checkstyle
+        run: |
+          curl -L -o checkstyle.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.12.4/checkstyle-10.12.4-all.jar
+
+      - name: Ejecutar Checkstyle
+        run: java -jar checkstyle.jar -c checkstyle.xml src/main/java

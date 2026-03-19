@@ -1,0 +1,14 @@
+<module name="Checker">
+    <module name="LineLength">
+        <property name="max" value="140"/>
+    </module>
+    <module name="TreeWalker">
+        <module name="AvoidStarImport"/>
+        <module name="UnusedImports"/>
+        <module name="NeedBraces"/>
+        <module name="MethodName"/>
+        <module name="TypeName"/>
+        <module name="ParameterName"/>
+        <module name="LocalVariableName"/>
+    </module>
+</module>

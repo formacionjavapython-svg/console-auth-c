@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class User {
 
 
@@ -5,8 +7,8 @@ public class User {
     private String passwordHash;
 
     public User(String email, String passwordHash) {
-        this.email = email;
-        this.passwordHash = passwordHash;
+        this.email = Objects.requireNonNull(email, "email no puede ser null");
+        this.passwordHash = Objects.requireNonNull(passwordHash, "password no puede ser null");
     }
 
     public String getEmail() {
