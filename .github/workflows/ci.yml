@@ -38,7 +38,7 @@ jobs:
           java -cp out test.java.TestRunner > test-report-c29miguelruiz.txt
 
       # 7
-      - name: Subir Reporte de Pruebas
+      - name: Subir Reporte d Pruebas
         uses: actions/upload-artifact@v4
         with:
           name: reporte-autenticacion
