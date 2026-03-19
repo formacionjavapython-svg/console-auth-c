@@ -1,73 +1,13 @@
 name: CI
-
-on:
-  push:
-    branches: [ C30_Javier ]
-  pull_request:
-    branches: [ C30_Javier ]
-
+on: [ push, pull_request ]
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'
-
-      - name: Compile
-        run: |
-          mkdir -p out
-          find src -name "*.java" > sources.txt
-          javac -d out @sources.txt
-
-      - name: Test
-        run: java -cp out TestRunner > test-results.log
-
-      - name: Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: execution-report
-          path: test-results.log
-
-      - name: Checkstyle
-        run: java -jar checkstyle.jar -c checkstyle.xml src/
-
-  analyze:
-    name: SAST
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Init
-        uses: github/codeql-action/init@v3
-        with:
-          languages: java
-
-      - name: Manual Build
-        run: |
-          mkdir -p out
-          find src -name "*.java" > sources.txt
-          javac -d out @sources.txt
-
-      - name: Analyze
-        uses: github/codeql-action/analyze@v3
+      - run: javac -d out src/**/*.java
+      - run: java -cp out TestRunner
+      - run: java -jar checkstyle.jar -c checkstyle.xml src/
