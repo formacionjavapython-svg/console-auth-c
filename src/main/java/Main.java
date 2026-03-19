@@ -1,4 +1,8 @@
-import rules.*;
+import rules.Email;
+import rules.PasswordPolicy;
+import rules.MinLengthRule;
+import rules.ContainsNumberRule;
+import rules.NoEmailInPasswordRule;
 import java.util.Scanner;
 import java.util.Optional;
 import java.util.List;
