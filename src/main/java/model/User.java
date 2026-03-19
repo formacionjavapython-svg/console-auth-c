@@ -1,23 +1,23 @@
 package main.java.model;
 
 public class User {
-    private String username;
-    private String passwordHash;
+    private Email email;
+    private HashedPassword passwordHash;
 
-    public User(String username, String password) {
-        this.username = username;
+    public User(Email email, HashedPassword password) {
+        this.email = email;
         this.passwordHash = password;
     }
 
-    public String getUsername() {
-        return this.username;
+    public void setEmail(Email email) {
+        this.email = email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public Email getEmail() {
+        return this.email;
     }
 
-    public String getPasswordHash() {
-        return this.passwordHash;
+    public String getHashedPassword() {
+        return this.passwordHash.getHashedPasswordString();
     }
 }
