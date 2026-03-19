@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AuthService {
-    private final Map<String, user> repository = new HashMap<>();
+    private final Map<String, User> repository = new HashMap<>();
 
     public String register(String email, String password) {
         if (!password.matches(Auth.PASSWORD_POLICY)) {
@@ -19,7 +19,7 @@ public class AuthService {
         try {
             byte[] salt = PasswordPolicy.generateSalt();
             String hash = PasswordPolicy.hash(password, salt, Auth.PEPPER);
-            repository.put(email, new user(email, hash, salt));
+            repository.put(email, new User(email, hash, salt));
             return "Usuario registrado con éxito.";
         } catch (Exception e) {
             return "Error interno del sistema.";
@@ -27,7 +27,7 @@ public class AuthService {
     }
 
     public String login(String email, String password) {
-        user user = repository.get(email);
+        User user = repository.get(email);
         try {
             if (user != null) {
                 String attemptHash = PasswordPolicy.hash(password, user.getSalt(), Auth.PEPPER);

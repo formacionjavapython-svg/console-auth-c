@@ -6,7 +6,7 @@ import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
-public class password {
+public class Password {
     private static final String ALGORITHM = "PBKDF2WithHmacSHA256";
     private static final int ITERATIONS = 65536;
     private static final int KEY_LENGTH = 256;
