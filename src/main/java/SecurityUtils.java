@@ -5,7 +5,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 public class SecurityUtils {
-    // El "Pepper" solicitado en la diapositiva
+    // Pepper
     private static final String AUTH_PEPPER_SECRET = "C34_SECRET_PEPPER_2026";
     private static final int ITERATIONS = 100000;
     private static final int KEY_LENGTH = 256;
@@ -16,7 +16,7 @@ public class SecurityUtils {
             byte[] salt = new byte[16];
             SecureRandom.getInstance("SHA1PRNG").nextBytes(salt);
             
-            // Concatenamos el Pepper antes de hashear
+            // Primero Pepper luego hash
             String combined = password + AUTH_PEPPER_SECRET;
             
             PBEKeySpec spec = new PBEKeySpec(combined.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
@@ -41,7 +41,7 @@ public class SecurityUtils {
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             byte[] testHash = factory.generateSecret(spec).getEncoded();
 
-            // Comparación Constant-Time (evita timing attacks)
+            // Comparación Constant-Time
             return java.security.MessageDigest.isEqual(hash, testHash);
         } catch (Exception e) {
             return false;

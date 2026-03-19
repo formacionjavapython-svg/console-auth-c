@@ -3,19 +3,38 @@ import java.util.List;
 public class TestRunner {
     private static UserRepository repo;
     private static PasswordPolicy policy;
+    private static int failedTests = 0;
 
     public static void main(String[] args) {
-        System.out.println("=== INICIANDO PRUEBAS AUTOMATIZADAS ===");
+        System.out.println("=== CI/CD: EJECUTANDO PRUEBAS AUTOMATIZADAS ===");
         
         try {
-            testRegisterAndLoginSuccess();
-            testLoginPasswordIncorrect();
-            testPasswordPolicyRejectsWeak();
+            runTest("Registro + Login Exitoso", TestRunner::testRegisterAndLoginSuccess);
+            runTest("Login con Password Incorrecto", TestRunner::testLoginPasswordIncorrect);
+            runTest("Password Policy Bloquea Débiles", TestRunner::testPasswordPolicyRejectsWeak);
             
-            System.out.println("\n ¡TODAS LAS PRUEBAS PASARON EXITOSAMENTE!");
+            if (failedTests > 0) {
+                System.err.println("\n CI/CD FALLIDO: " + failedTests + " pruebas fallaron.");
+                System.exit(1); // Esto detiene el Workflow de GitHub si hay errores
+            } else {
+                System.out.println("\n CI/CD EXITOSO: Todas las pruebas pasaron.");
+                System.exit(0);
+            }
         } catch (Exception e) {
-            System.err.println("\n ERROR EN LAS PRUEBAS: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("\n ERROR EN EL RUNNER: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    // Método auxiliar para manejar las pruebas 
+    private static void runTest(String name, Runnable test) {
+        try {
+            setup();
+            test.run();
+            System.out.println("PASÓ: " + name);
+        } catch (Throwable e) {
+            System.err.println("FALLÓ: " + name + " -> " + e.getMessage());
+            failedTests++;
         }
     }
 
@@ -25,39 +44,31 @@ public class TestRunner {
     }
 
     private static void testRegisterAndLoginSuccess() {
-        setup();
-        System.out.print("Prueba 1: Registro + Login Exitoso... ");
         Email email = new Email("test@pro.com");
         String pass = "Secure1234";
+        repo.save(new User(email, SecurityUtils.hashPassword(pass)));
         
-        // Registro
-        String hashed = SecurityUtils.hashPassword(pass);
-        repo.save(new User(email, hashed));
-        
-        // Login
         User saved = repo.findByEmail("test@pro.com").orElseThrow();
-        assert SecurityUtils.verifyPassword(pass, saved.getPasswordHash()) : "El login debió ser exitoso";
-        System.out.println("PASÓ");
+        if (!SecurityUtils.verifyPassword(pass, saved.getPasswordHash())) {
+            throw new RuntimeException("El login debió ser exitoso");
+        }
     }
 
     private static void testLoginPasswordIncorrect() {
-        setup();
-        System.out.print("Prueba 2: Login con Password Incorrecto... ");
         Email email = new Email("hacker@web.com");
         repo.save(new User(email, SecurityUtils.hashPassword("ClaveReal123")));
         
         User saved = repo.findByEmail("hacker@web.com").orElseThrow();
-        assert !SecurityUtils.verifyPassword("ClaveFalsa", saved.getPasswordHash()) : "El login debió fallar";
-        System.out.println("PASÓ");
+        if (SecurityUtils.verifyPassword("ClaveFalsa", saved.getPasswordHash())) {
+            throw new RuntimeException("El login debió fallar con clave falsa");
+        }
     }
 
     private static void testPasswordPolicyRejectsWeak() {
-        setup();
-        System.out.print("Prueba 3: Password Policy Bloquea Débiles... ");
         Email email = new Email("user@test.com");
-        
         List<String> violations = policy.validate("123", email);
-        assert !violations.isEmpty() : "La política debió encontrar errores para '123'";
-        System.out.println("PASÓ");
+        if (violations.isEmpty()) {
+            throw new RuntimeException("La política debió rechazar el password '123'");
+        }
     }
 }
