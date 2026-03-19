@@ -1,0 +1,25 @@
+name: Java CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Compilar proyecto
+        run: javac -d out $(find src -name "*.java")
+
+      - name: Ejecutar TestRunner
+        run: java -cp out com.auth.TestRunner
