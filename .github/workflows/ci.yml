@@ -12,9 +12,11 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         java-version: '11'  # Java 11 para compatibilidad con entorno local
+        distribution: 'temurin'
     
     - run: javac -d out src/**/*.java
     
     - run: java -cp out TestRunner
     
     - run: java -jar checkstyle.jar -c checkstyle.xml src/
+
