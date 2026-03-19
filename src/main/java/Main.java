@@ -8,22 +8,26 @@ public class Main {
 
     public static void main(String[] args) {
         boolean salir=false;
-        boolean ingreso=false;
         boolean registrado=false;
         String correo="";
-        String password="";
+        String Password="";
         Scanner sc = new Scanner(System.in);
         int contador=0;
         do {
 
                 System.out.println("\n---  REGISTROS ---");
-                System.out.println("1. Registrar nuevo correo");
+                System.out.println("Registrar nuevo correo");
                 System.out.println("Ingrese correo");
                  correo = sc.nextLine();
+                 if (!ValidaEmail.validarEmail(correo))
+                 {
+                     System.out.println("Formato de email incorrecto");
+                     continue;
+                 }
                 System.out.println("Ingresa una contraseña");
-                 password = sc.nextLine();
-                if (ValidaEmail.validarPassword(password)) {
-
+                Password = sc.nextLine();
+                boolean bandera=ValidaPassword.esSegura(Password);
+                if(bandera) {
                     registrado=true;
                     salir=true;
                 } else {
@@ -40,7 +44,7 @@ public class Main {
         }while (!salir);
         if (registrado)
         {
-            Usuarios usuario = new Usuarios(correo, password);
+            Usuarios usuario = new Usuarios(correo, Password);
             do {
                 System.out.println("\n---  Inicio de sesion ---");
                 System.out.println("Ingrese correo");
