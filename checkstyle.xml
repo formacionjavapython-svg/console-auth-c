@@ -17,6 +17,10 @@
 
     <module name="FileTabCharacter"/>
 
+    <module name="LineLength">
+        <property name="max" value="120"/>
+    </module>
+
     <module name="TreeWalker">
         <!-- Naming conventions -->
         <module name="ConstantName"/>
@@ -34,9 +38,6 @@
         <module name="RedundantImport"/>
 
         <!-- Tamano -->
-        <module name="LineLength">
-            <property name="max" value="120"/>
-        </module>
         <module name="MethodLength">
             <property name="max" value="50"/>
         </module>
