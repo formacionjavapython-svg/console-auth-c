@@ -1,6 +1,8 @@
+import rules.Email; 
+
 public class User {
     private final Email email;
-    private final String passwordHash; // Usaremos un String por ahora para el hash
+    private final String passwordHash;
 
     public User(Email email, String passwordHash) {
         this.email = email;

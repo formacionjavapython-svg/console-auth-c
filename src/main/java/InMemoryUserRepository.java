@@ -2,6 +2,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import rules.Email;
+
 public class InMemoryUserRepository implements UserRepository {
     private final Map<Email, User> users = new HashMap<>();
 

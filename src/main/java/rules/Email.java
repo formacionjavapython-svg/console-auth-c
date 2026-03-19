@@ -1,3 +1,4 @@
+package rules;
 public class Email {
     private final String value;
 
