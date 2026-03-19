@@ -14,6 +14,7 @@ public class AuthService {
         rules.add(new MinLengthRule());
         rules.add(new ContainsNumberRule());
         rules.add(new NoEmailInPasswordRule());
+        rules.add(new ContainsUppercaseRule());
     }
 
     public List<String> validatePassword(String password, String email) {
