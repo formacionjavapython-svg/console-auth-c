@@ -1,4 +1,6 @@
-package PACKAGE_NAME;
+import java.util.Optional;
 
-public class UserRepository {
+public interface UserRepository {
+    void save(User user);
+    Optional<User> findByEmail(Email email);
 }

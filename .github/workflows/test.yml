@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [ "C03_Carlos_Alexis_Morales_Mentado" ]
+  pull_request:
+    branches: [ "C03_Carlos_Alexis_Morales_Mentado" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Compile and Run Tests
+        run: |
+          mkdir -p out
+          javac -d out src/main/java/*.java
+          java -cp out TestRunner
