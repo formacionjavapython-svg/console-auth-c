@@ -19,9 +19,10 @@ jobs:
       - name: Compilar con javac
         run: |
           mkdir -p out
-          # Compilamos todo el proyecto junto para que se reconozcan las clases
-          javac -d out -cp "src/main/java:src/test/java" src/main/java/*.java src/main/java/rules/*.java src/test/java/*.java
-
+          # Usamos find para encontrar TODOS los archivos .java y compilarlos juntos
+          find src -name "*.java" > sources.txt
+          javac -d out -cp "src/main/java:src/test/java" @sources.txt
+          
       - name: Ejecución de Tests
         run: java -cp out TestRunner
 
