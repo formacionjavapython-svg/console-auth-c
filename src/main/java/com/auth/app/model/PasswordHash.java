@@ -41,11 +41,15 @@ public final class PasswordHash {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PasswordHash)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PasswordHash)) {
+            return false;
+        }
         PasswordHash that = (PasswordHash) o;
-        return Arrays.equals(hash, that.hash) &&
-               Arrays.equals(salt, that.salt);
+        return Arrays.equals(hash, that.hash)
+                && Arrays.equals(salt, that.salt);
     }
 
     @Override

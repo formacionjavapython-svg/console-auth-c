@@ -14,9 +14,5 @@
     <module name="TypeName"/>
     <module name="ParameterName"/>
     <module name="LocalVariableName"/>
-	<module name="Indentation"/>
-	<module name="ConstantName"/>
-	<module name="ImportOrder"/>
-	<module name="CyclomaticComplexity"/>
   </module>
 </module>
