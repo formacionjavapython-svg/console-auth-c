@@ -16,11 +16,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Compilar
-        run: find src/main/java -name "*.java" > sources.txt && javac -d out @sources.txt
-
-      - name: Compilar tests
-        run: find src/test/java -name "*.java" > tests.txt && javac -cp out -d out @tests.txt
+      - name: Compilar todo
+        run: find src -name "*.java" > sources.txt && javac -d out @sources.txt
 
       - name: Ejecutar tests
         run: java -cp out auth.TestRunner
