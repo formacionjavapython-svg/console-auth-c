@@ -11,7 +11,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         
         while (true) {
-            System.out.println("\n--- SISTEMA DE AUTENTICACIÓN (DISEÑO FUNCIONAL) ---");
+            System.out.println("\n--- -SISTEMA DE AUTENTICACIÓN (DISEÑO FUNCIONAL) ---");
             System.out.println("1. Registrarse");
             System.out.println("2. Iniciar Sesión");
             System.out.println("3. Salir");
