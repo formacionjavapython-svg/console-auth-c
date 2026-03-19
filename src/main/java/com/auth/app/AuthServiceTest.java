@@ -1,4 +1,5 @@
 package com.auth.app;
+
 import com.auth.app.repository.InMemoryUserRepository;
 import com.auth.app.repository.UserRepository;
 import com.auth.app.service.AuthService;
@@ -8,18 +9,9 @@ import com.auth.app.validation.MinLengthRule;
 import com.auth.app.validation.NoEmailInPasswordRule;
 import java.util.List;
 
+
 public class AuthServiceTest {
-    public static void main(String[] args) {
-
-    System.out.println("--- INICIANDO TEST RUNNER PERSONALIZADO ---");
-
-    testRegisterAndLoginSuccess();
-    testPasswordPolicyBlocks();
-
-    System.out.println("--- TODAS LAS PRUEBAS FINALIZADAS ---");
-  }
-
-  static AuthService buildAuthService() {
+  private AuthService buildService() {
 
     UserRepository repo = new InMemoryUserRepository();
 
@@ -32,25 +24,53 @@ public class AuthServiceTest {
     return new AuthService(repo, policy);
   }
 
-  static void testRegisterAndLoginSuccess() {
+  public String testRegisterSuccess() {
 
-    AuthService auth = buildAuthService();
+    AuthService auth = buildService();
 
-    List<String> errors = auth.register("irvin@test.com", "Password2026!");
+    List<String> errors = auth.register("test@mail.com", "Password2026!");
 
-    boolean loginSuccess = auth.login("irvin@test.com", "Password2026!");
+    boolean login = auth.login("test@mail.com", "Password2026!");
 
-    System.out.println("Test Registro + Login: "
-        + (errors.isEmpty() && loginSuccess ? "PASÓ" : "FALLÓ"));
+    return errors.isEmpty() && login
+        ? "Register + Login Exitoso: PASÓ"
+        : "Register + Login Exitoso: FALLÓ";
   }
 
-  static void testPasswordPolicyBlocks() {
+  public String testLoginFailure() {
 
-    AuthService auth = buildAuthService();
+    AuthService auth = buildService();
 
-    List<String> errors = auth.register("irvin@test.com", "123");
+    auth.register("test@mail.com", "Password2026!");
 
-    System.out.println("Test Política Bloquea: "
-        + (!errors.isEmpty() ? "PASÓ" : "FALLÓ"));
+    boolean login = auth.login("test@mail.com", "WrongPass123");
+
+    return !login
+        ? "Login con password incorrecto: PASÓ"
+        : "ogin con password incorrecto: FALLÓ";
+  }
+
+  public String testLoginSuccess() {
+
+    AuthService auth = buildService();
+
+    auth.register("test@mail.com", "Password2026!");
+
+    boolean login = auth.login("test@mail.com", "Password2026!");
+
+    return login
+        ? "Login correcto: PASÓ"
+        : "Login correcto: FALLÓ";
+  }
+
+  public String testPolicyRejects() {
+
+    AuthService auth = buildService();
+
+    List<String> errors = auth.register("test@mail.com", "123");
+
+    return !errors.isEmpty()
+        ? "Password policy bloquea: PASÓ"
+        : "Password policy bloquea: FALLÓ";
   }
 }

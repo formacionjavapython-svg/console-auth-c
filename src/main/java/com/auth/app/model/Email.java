@@ -7,10 +7,10 @@ public final class Email {
     private final String value;
 
     public Email(String value) {
-        if (value == null || !value.contains("@") || !value.contains(".")) {
+        if (value == null || !value.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
             throw new IllegalArgumentException("Invalid email");
         }
-        this.value = value;
+        this.value = value.toLowerCase(); // opcional: normalización
     }
 
     public String getValue() {
@@ -19,8 +19,12 @@ public final class Email {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Email)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Email)) {
+            return false;
+        }
         Email email = (Email) o;
         return value.equals(email.value);
     }
@@ -28,5 +32,10 @@ public final class Email {
     @Override
     public int hashCode() {
         return Objects.hash(value);
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 }
