@@ -2,7 +2,7 @@ name: Java CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ C14-Manuel_Diego_Santiago ]
 
 jobs:
   build:
