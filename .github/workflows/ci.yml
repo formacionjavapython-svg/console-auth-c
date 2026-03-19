@@ -22,16 +22,11 @@ jobs:
     
     - name: Run tests
       run: |
-        # Check if TestRunner exists
-        if find . -name "*TestRunner*.java" | grep -q .; then
-          echo "Compiling TestRunner..."
-          find . -name "*TestRunner*.java" > testrunner.txt
-          javac -d out @testrunner.txt
-          java -cp out TestRunner
-        else
-          echo "No TestRunner found, skipping tests"
-        fi
-    
+        # Create and compile TestMain
+        echo 'public class TestMain { public static void main(String[] args) { new TestCase().testRegisterSuccess(); new TestCase().testLoginSuccess(); }}' > TestMain.java
+        javac -d out -cp out TestMain.java
+        java -cp out TestMain
+
     - name: Download and run Checkstyle
       run: |
         wget -q -O checkstyle.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.12.5/checkstyle-10.12.5-all.jar

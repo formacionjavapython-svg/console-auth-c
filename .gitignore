@@ -52,3 +52,7 @@ Thumbs.db
 *.orig
 *.bak
 
+
+# Text files generated during build
+*.txt
+
