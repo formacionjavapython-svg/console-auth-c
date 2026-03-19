@@ -19,10 +19,10 @@ jobs:
         run: |
           mkdir -p out
           find src -name "*.java" > sources.txt
-          javac -d out -cp ".:lib/*" @sources.txt
+          javac -d out -cp ".:*" @sources.txt
 
       - name: Run Tests
-        run: java -cp "out:lib/*" test.java.TestRunner
+        run: java -cp "out;*" test.java.TestRunner
 
       - name: Checkstyle
         run: java -jar checkstyle.jar -c checkstyle.xml src/
