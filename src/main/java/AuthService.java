@@ -1,43 +1,96 @@
-import java.util.ArrayList;
 import java.util.List;
-import java.security.spec.KeySpec;
-import java.util.Base64;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import java.security.SecureRandom;
+import java.util.Optional;
 
-public class AuthService {
-    private List<PasswordRule> rules = new ArrayList<>();
-    private static final String PEPPER = "Railway_System_2026";
+/**
+ * Servicio de autenticacion (logica de negocio).
+ * Coordina registro y login aplicando politica de contrasenas,
+ * validacion de email y hashing seguro.
+ *
+ * Mensajes de error genericos para no filtrar informacion
+ * (no se revela si un email existe o no).
+ */
+public final class AuthService {
 
-    public AuthService() {
-        rules.add(new MinLengthRule());
-        rules.add(new ContainsNumberRule());
-        rules.add(new NoEmailInPasswordRule());
+    private static final String GENERIC_ERROR = "Credenciales invalidas.";
+
+    private final UserRepository userRepository;
+    private final HashingService hashingService;
+    private final PasswordPolicy passwordPolicy;
+
+    public AuthService(final UserRepository userRepository,
+                       final HashingService hashingService,
+                       final PasswordPolicy passwordPolicy) {
+        this.userRepository = userRepository;
+        this.hashingService = hashingService;
+        this.passwordPolicy = passwordPolicy;
     }
 
-    public List<String> validatePassword(String password, String email) {
-        List<String> violations = new ArrayList<>();
-        for (PasswordRule rule : rules) {
-            String error = rule.validate(password, email);
-            if (error != null) violations.add(error);
+    /**
+     * Registra un nuevo usuario.
+     *
+     * @param email    email del usuario
+     * @param password contrasena en texto plano
+     * @return resultado de la operacion
+     */
+    public AuthResult register(final String email, final String password) {
+        if (!EmailValidator.isValid(email)) {
+            return AuthResult.fail("Formato de email invalido.");
         }
-        return violations;
+
+        final List<String> violations = passwordPolicy.validate(password, email);
+        if (!violations.isEmpty()) {
+            return AuthResult.fail(
+                    "La contrasena no cumple la politica:\n  - "
+                    + String.join("\n  - ", violations)
+            );
+        }
+
+        if (userRepository.existsByEmail(email)) {
+            // Mensaje generico: no revelamos que el email ya existe
+            return AuthResult.fail(GENERIC_ERROR);
+        }
+
+        final String salt = hashingService.generateSalt();
+        final String hash = hashingService.hash(password, salt);
+        final User user = new User(email, hash, salt);
+
+        if (userRepository.save(user)) {
+            return AuthResult.ok("Registro exitoso. Bienvenido/a.");
+        }
+
+        return AuthResult.fail(GENERIC_ERROR);
     }
 
-    public String hashPassword(String password, byte[] salt) throws Exception {
-        KeySpec spec = new PBEKeySpec((password + PEPPER).toCharArray(), salt, 65536, 128);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        return Base64.getEncoder().encodeToString(factory.generateSecret(spec).getEncoded());
-    }
+    /**
+     * Inicia sesion verificando credenciales.
+     * Retorna exito o fallo generico (sin filtrar informacion).
+     *
+     * @param email    email del usuario
+     * @param password contrasena en texto plano
+     * @return resultado de la operacion
+     */
+    public AuthResult login(final String email, final String password) {
+        if (email == null || email.isBlank() || password == null || password.isBlank()) {
+            return AuthResult.fail(GENERIC_ERROR);
+        }
 
-    public boolean verifyPassword(String input, String stored, byte[] salt) throws Exception {
-        return hashPassword(input, salt).equals(stored);
-    }
+        final Optional<User> optUser = userRepository.findByEmail(email);
 
-    public byte[] generateSalt() {
-        byte[] salt = new byte[16];
-        new SecureRandom().nextBytes(salt);
-        return salt;
+        if (optUser.isEmpty()) {
+            // Hash ficticio para igualar tiempo de respuesta (anti timing-attack)
+            hashingService.hash(password, hashingService.generateSalt());
+            return AuthResult.fail(GENERIC_ERROR);
+        }
+
+        final User user = optUser.get();
+        final boolean valid = hashingService.verify(
+                password, user.getSalt(), user.getPasswordHash()
+        );
+
+        if (valid) {
+            return AuthResult.ok("Inicio de sesion exitoso. Bienvenido/a, " + user.getEmail() + ".");
+        }
+
+        return AuthResult.fail(GENERIC_ERROR);
     }
 }

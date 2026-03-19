@@ -1,74 +1,120 @@
+import java.io.Console;
 import java.util.Scanner;
-import java.util.Base64;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Main {
-    private static List<User> database = new ArrayList<>();
-    private static AuthService auth = new AuthService();
+/**
+ * Aplicacion de consola interactiva (Interfaz).
+ * Menu: Registrarse, Iniciar Sesion, Salir.
+ *
+ * No mantiene sesiones activas: al cerrar se descarta todo (GC).
+ * El pepper se lee de variable de entorno AUTH_PEPPER.
+ */
+public final class Main {
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        
-        while (true) {
-            System.out.println("\n--- SISTEMA DE AUTENTICACIÓN (DISEÑO FUNCIONAL) ---");
-            System.out.println("1. Registrarse");
-            System.out.println("2. Iniciar Sesión");
-            System.out.println("3. Salir");
-            System.out.print("Opción: ");
-            String input = sc.nextLine();
-            
-            if (input.equals("1")) {
-                System.out.print("Email: ");
-                String email = sc.nextLine().trim().toLowerCase();
-                System.out.print("Password: ");
-                String pass = sc.nextLine();
-                
-                // Usamos el nuevo validador composable
-                List<String> errores = auth.validatePassword(pass, email);
-                
-                if (errores.isEmpty()) {
-                    try {
-                        byte[] salt = auth.generateSalt();
-                        String hash = auth.hashPassword(pass, salt);
-                        String savedData = hash + ":" + Base64.getEncoder().encodeToString(salt);
-                        database.add(new User(email, savedData));
-                        System.out.println("[OK] Usuario registrado con éxito.");
-                    } catch (Exception e) { System.out.println("[!] Error interno."); }
-                } else {
-                    System.out.println("[ERROR] La contraseña es débil:");
-                    for (String err : errores) {
-                        System.out.println(" - " + err);
-                    }
-                }
+    private static final String MENU = """
 
-            } else if (input.equals("2")) {
-                System.out.print("Email: ");
-                String email = sc.nextLine().trim().toLowerCase();
-                System.out.print("Password: ");
-                String pass = sc.nextLine();
-                
-                boolean encontrado = false;
-                for (User u : database) {
-                    if (u.getEmail().equals(email)) {
-                        try {
-                            String[] parts = u.getPasswordHash().split(":");
-                            byte[] salt = Base64.getDecoder().decode(parts[1]);
-                            if (auth.verifyPassword(pass, parts[0], salt)) {
-                                System.out.println("\n[BIENVENIDO] ¡Acceso concedido!");
-                            } else {
-                                System.out.println("\n[ERROR] Credenciales inválidas.");
-                            }
-                            encontrado = true;
-                            break;
-                        } catch (Exception e) { System.out.println("[!] Error al validar."); }
-                    }
-                }
-                if (!encontrado) System.out.println("\n[ERROR] Credenciales inválidas.");
-            } else if (input.equals("3")) {
-                System.out.println("Cerrando sistema...");
-                break;
+            ===================================
+              Sistema de Autenticacion
+            ===================================
+              1. Registrarse
+              2. Iniciar Sesion
+              3. Salir
+            ===================================
+            Seleccione una opcion:\s""";
+
+    private final AuthService authService;
+    private final Scanner scanner;
+    private boolean running;
+
+    public Main(final AuthService authService, final Scanner scanner) {
+        this.authService = authService;
+        this.scanner = scanner;
+        this.running = true;
+    }
+
+    /**
+     * Bucle principal de la aplicacion.
+     */
+    public void run() {
+        while (running) {
+            System.out.print(MENU);
+            final String option = scanner.nextLine().trim();
+
+            switch (option) {
+                case "1" -> handleRegister();
+                case "2" -> handleLogin();
+                case "3" -> handleExit();
+                default -> System.out.println("[!] Opcion no valida. Intente de nuevo.");
             }
         }
+    }
+
+    private void handleRegister() {
+        System.out.println("\n--- Registro ---");
+        System.out.print("Email: ");
+        final String email = scanner.nextLine().trim();
+
+        final String password = readPassword("Contrasena: ");
+
+        final AuthResult result = authService.register(email, password);
+        printResult(result);
+    }
+
+    private void handleLogin() {
+        System.out.println("\n--- Iniciar Sesion ---");
+        System.out.print("Email: ");
+        final String email = scanner.nextLine().trim();
+
+        final String password = readPassword("Contrasena: ");
+
+        final AuthResult result = authService.login(email, password);
+        printResult(result);
+
+        // No se mantiene sesion activa: el resultado es efimero.
+        // Variables locales son elegibles para GC al salir del metodo.
+    }
+
+    private void handleExit() {
+        System.out.println("\nSaliendo del sistema. Hasta luego.");
+        running = false;
+        // Al terminar, todas las referencias en memoria son elegibles para GC.
+    }
+
+    /**
+     * Lee la contrasena desde consola (oculta si es posible).
+     * Si no hay consola (IDE), usa Scanner.
+     */
+    private String readPassword(final String prompt) {
+        final Console console = System.console();
+        if (console != null) {
+            final char[] pwd = console.readPassword(prompt);
+            return new String(pwd);
+        }
+        System.out.print(prompt);
+        return scanner.nextLine();
+    }
+
+    private void printResult(final AuthResult result) {
+        final String prefix = result.isSuccess() ? "[OK] " : "[ERROR] ";
+        System.out.println(prefix + result.getMessage());
+    }
+
+    // --- Entry point ---
+
+    public static void main(final String[] args) {
+        // Pepper desde variable de entorno (configurable)
+        final String pepper = System.getenv().getOrDefault("AUTH_PEPPER", "defaultPepper2025!");
+
+        final var repository = new UserRepository();
+        final var hashingService = new HashingService(pepper);
+        final var passwordPolicy = PasswordPolicy.defaultPolicy();
+        final var authService = new AuthService(repository, hashingService, passwordPolicy);
+
+        try (var inputScanner = new Scanner(System.in)) {
+            final var app = new Main(authService, inputScanner);
+            app.run();
+        }
+
+        // Al llegar aqui, todas las referencias se liberan -> GC
+        System.out.println("Recursos liberados. Programa terminado.");
     }
 }

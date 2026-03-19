@@ -1,31 +1,64 @@
-# Sistema de Autenticación de Consola (Java)
+# Sistema de Registro y Login en Java
+# C36 Sandoval Mandujano Samuel
 
-Este proyecto es un sistema de gestión de usuarios que implementa estándares de seguridad modernos para el registro y autenticación.
+Laboratorio Practico — Sistema completo de autenticacion en consola.
+Java 17 | Sin frameworks | Almacenamiento en memoria.
 
-## 🚀 Características y Criterios de Aceptación
-- **Programación Orientada a Objetos (POO)**: Estructura dividida en modelos (`User`), lógica de negocio (`AuthService`) e interfaz (`Main`).
-- **Política de Contraseñas**: Validación de robustez (mínimo 8 caracteres, una mayúscula y un número).
-- **Criptografía Avanzada**: Implementación de **PBKDF2 con HMAC-SHA1**.
-- **Seguridad contra Ataques**:
-    - **Salt Aleatorio**: Cada usuario tiene un salt único de 16 bytes para evitar Rainbow Tables.
-    - **Pepper**: Capa extra de seguridad estática en el servidor.
-    - **Iteraciones**: 65,536 iteraciones para dificultar ataques de fuerza bruta.
+# Estructura
 
-## 🛠️ Cómo Ejecutar
-1. **Compilar**:
-   ```bash
-   javac src/main/java/*.java
-   ```
-2. **Ejecutar Aplicación**:
-   ```bash
-   java -cp src/main/java Main
-   ```
-3. **Ejecutar Pruebas (Tests)**:
-   ```bash
-   java -cp src/main/java AuthServiceTest
-   ```
+```
+src/main/java/
+├── Main.java                  → Interfaz de consola (punto de entrada)
+├── User.java                  → Modelo (POO)
+├── UserRepository.java        → Repositorio en memoria
+├── AuthService.java           → Logica de negocio
+├── AuthResult.java            → Patron Result funcional
+├── HashingService.java        → PBKDF2 + HMAC-SHA1 + salt + pepper
+├── EmailValidator.java        → Validacion de email
+├── PasswordRule.java          → Interfaz de regla composable
+├── PasswordPolicy.java        → Composicion de reglas
+├── MinLengthRule.java         → Regla: longitud minima
+├── ContainsUppercaseRule.java → Regla: al menos una mayuscula
+├── ContainsNumberRule.java    → Regla: al menos un numero
+├── NoEmailInPasswordRule.java → Regla: no incluir email
+└── AuthServiceTest.java       → Pruebas automatizadas (TestRunner custom)
+```
 
-## ✅ Pruebas Unitarias
-El proyecto incluye un archivo `AuthServiceTest.java` que valida automáticamente:
-1. Que la política de contraseñas bloquee claves débiles.
-2. Que el proceso de Hashing y Verificación funcione correctamente.
+# Ejecutar
+
+```bash
+# Compilar
+javac src/main/java/*.java
+
+# Ejecutar aplicacion
+java -cp src/main/java Main
+
+# Ejecutar pruebas (tests)
+java -cp src/main/java AuthServiceTest
+```
+
+# Seguridad
+
+- **Hashing**: PBKDF2WithHmacSHA1 (65,536 iteraciones, Java estandar).
+- **Salt**: Unico por usuario (16 bytes, SecureRandom) — evita Rainbow Tables.
+- **Pepper**: Variable de entorno `AUTH_PEPPER` — capa extra en el servidor.
+- **Mensajes genericos**: No se filtra si un email existe o no.
+- **Timing-attack**: Comparacion en tiempo constante + hash ficticio en login fallido.
+- **Sin sesiones activas**: Al salir, todo es elegible para garbage collector.
+
+# Diseno Funcional: Password Policy Composable
+
+Validacion de passwords usando composicion de reglas. Cada regla es independiente
+y puede combinarse con otras, permitiendo extensibilidad sin modificar codigo existente
+(principio Open/Closed).
+
+- `PasswordRule` — Interfaz: metodo `validate(password, email)` retorna violaciones.
+- `MinLengthRule` — Longitud minima configurable (ej: 8 caracteres).
+- `ContainsUppercaseRule` — Al menos una mayuscula.
+- `ContainsNumberRule` — Al menos un digito.
+- `NoEmailInPasswordRule` — Previene email en la contrasena.
+- `PasswordPolicy` — Compone reglas y ejecuta `validate()` agregando todas las violaciones.
+
+# CI/CD
+
+GitHub Actions ejecuta automaticamente: build → test en cada push.
