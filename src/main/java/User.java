@@ -1,10 +1,13 @@
+import java.util.Objects;
+
 public class User {
     private final Email email;
     private final String passwordHash;
 
     public User(Email email, String passwordHash) {
-        this.email = email;
-        this.passwordHash = passwordHash;
+        // Validación defensiva
+        this.email = Objects.requireNonNull(email, "Email obligatorio");
+        this.passwordHash = Objects.requireNonNull(passwordHash, "Hash obligatorio");
     }
 
     public Email getEmail() { return email; }
