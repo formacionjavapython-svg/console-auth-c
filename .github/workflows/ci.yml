@@ -2,9 +2,9 @@ name: Java CI (Manual Build)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "C15_David_Branch" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "C15_David_Branch" ]
 
 jobs:
   build-and-test:
