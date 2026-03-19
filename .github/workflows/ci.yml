@@ -1,0 +1,13 @@
+name: CI
+on: [push, pull_request]
+jobs:
+build:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v3
+- uses: actions/setup-java@v3
+with:
+java-version: '17'
+- run: javac -d out src/**/*.java
+- run: java -cp out RunnerTest
+- run: java -jar checkstyle.jar -c checkstyle.xml src/
