@@ -22,9 +22,12 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'temurin'
 
       - name: Compile
-        run: javac -d out src/**/*.java
+        run: |
+          mkdir -p out
+          javac -d out src/**/*.java
 
       - name: Test
         run: java -cp out TestRunner > test-results.log
@@ -48,13 +51,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: Init
         uses: github/codeql-action/init@v3
         with:
           languages: java
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+      - name: Manual Build
+        run: |
+          mkdir -p out
+          javac -d out src/**/*.java
 
       - name: Analyze
         uses: github/codeql-action/analyze@v3
