@@ -119,7 +119,7 @@ public class AuthServiceTest {
         FakeUserRepository repo = new FakeUserRepository();
 
         String email = "test@test.com";
-        repo.save(new User(email, "123"));
+        repo.save(new User(email, PasswordUtil.hash("12345678")));
 
         AuthService service = new AuthService(repo);
 
@@ -131,7 +131,7 @@ public class AuthServiceTest {
 
         repo.clearAll();
     }
-
+    //PASSWORD CORTA
     static void testPasswordTooShort() {
         FakeUserRepository repo = new FakeUserRepository();
         AuthService service = new AuthService(repo);
@@ -143,6 +143,7 @@ public class AuthServiceTest {
         assert response.getStatus() == AuthStatus.VALIDATION_ERROR;
     }
 
+    //EMAIL EN PASSWORD
     static void testPasswordContainsEmail() {
         FakeUserRepository repo = new FakeUserRepository();
         AuthService service = new AuthService(repo);
