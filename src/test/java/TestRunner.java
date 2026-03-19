@@ -8,7 +8,7 @@ public class TestRunner {
     public static void run(AuthTests testCase) {
         List<String> results = new ArrayList<>();
 
-        // Ejecutamos cada test y guardamos el resultado
+        // ejecución d los tests
         results.add(executeTest("testRegisterAndLoginSuccess", () -> testCase.testRegisterAndLoginSuccess()));
         results.add(executeTest("testLoginWrongPasswordFailure", () -> testCase.testLoginWrongPasswordFailure()));
         results.add(executeTest("testRegisterPasswordPolicyRejects", () -> testCase.testRegisterPasswordPolicyRejects()));
@@ -26,9 +26,18 @@ public class TestRunner {
     }
 
     private static void printResults(List<String> results) {
+        boolean anyFailed = false;
         System.out.println("-- RESULTADOS DE TESTS ---");
         for (String res : results) {
             System.out.println(res);
+            if (res.contains("FAILURE")) {
+                anyFailed = true;
+            }
+        }
+
+        if (anyFailed) {
+            System.err.println("Se detectaron fallos en las pruebas.");
+            System.exit(1);
         }
     }
 

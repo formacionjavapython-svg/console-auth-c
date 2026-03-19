@@ -1,0 +1,33 @@
+name: CI de Autenticación
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. codigo del repo
+      - uses: actions/checkout@v3
+
+      # 2. config java17
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. compilacion y resultado en out
+      - name: Compilar Proyecto
+        run: |
+          mkdir -p out
+          javac -d out src/main/java/model/*.java src/main/java/service/*.java src/main/java/*.java src/test/java/*.java
+
+      # 4. ejecuta tests
+      - name: Ejecutar TestRunner
+        run: |
+          java -cp out test.java.TestRunner
+
+      # 5. checkstyle
+      - name: Correr Checkstyle
+        run: |
+          java -jar lib/checkstyle-*-all.jar -c checkstyle.xml src/

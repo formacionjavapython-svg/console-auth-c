@@ -18,7 +18,7 @@ public class Main {
         String selectedOption = "";
         System.out.println("Bienvenido al sistema de autenticación.");
         do {
-            System.out.println("1. Iniciar sesión\n2. Registrarse\n3. Salir\n--------------------\n");
+            System.out.println("1. Iniciar sesión\n2. Registrarse\n3. Cerrar Sesión\n4. Salir\n--------------------\n");
             selectedOption = sc.nextLine();
             String[] credentials;
             LinkedList<String> status;
@@ -50,7 +50,7 @@ public class Main {
                         break;
                     }
                     currentUser = authService.getCurrentUser();
-                    System.out.println("Usuario registrado: " + (currentUser != null ? currentUser.getEmail().getEmail() : "Ninguno"));
+                    System.out.println("Usuario registrado: "+(currentUser!=null ? currentUser.getEmail().getEmail() : "Ninguno"));
                     break;
                 case "3":
                     authService.logout();
@@ -59,6 +59,7 @@ public class Main {
                 case "4":
                     authService.logout();
                     System.out.println("Sesión cerrada. Saliendo del programa...");
+                    break;
                 default:
                     System.out.println("Opción inválida.");
             }

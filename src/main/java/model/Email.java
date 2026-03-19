@@ -4,7 +4,9 @@ public class Email {
     private String email;
 
     public Email(String email) {
-        if (!isValid(email)) throw new IllegalArgumentException("Email no válido.");
+        if (!isValid(email)) {
+            throw new IllegalArgumentException("Email no válido.");
+        }
         this.email = email;
     }
 

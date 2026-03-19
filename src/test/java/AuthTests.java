@@ -1,7 +1,6 @@
 package test.java;
 
 import java.util.LinkedList;
-
 import main.java.service.AuthService;
 
 public class AuthTests {
@@ -11,8 +10,11 @@ public class AuthTests {
         authService.logout();
         authService.register("correo@gmail.com", "manticora69");
         authService.login("correo@gmail.com", "manticora69");
-        if (authService.getCurrentUser() == null) System.out.println("FAILURE: Falló al registrar o loguear al usuario");
-        System.out.println("SUCCESS: Registro y login exitosos");
+        if (authService.getCurrentUser() == null) {
+            System.out.println("FAILURE: Falló al registrar o loguear al usuario");
+        } else {
+            System.out.println("SUCCESS: Registro y login exitosos");
+        }
     }
 
     public void testLoginWrongPasswordFailure() {
@@ -24,8 +26,9 @@ public class AuthTests {
             for (String error : status) {
                 System.out.println("Violaciones a la política de contraseña: " + error);
             }
+        } else {
+            System.out.println("FAILURE: Login exitoso, pero se esperaba fallo por contraseña incorrecta");
         }
-        else System.out.println("FAILURE: Login exitoso, pero se esperaba fallo por contraseña incorrecta");
     }
 
     public void testRegisterPasswordPolicyRejects() {
@@ -36,7 +39,8 @@ public class AuthTests {
             for (String error : status) {
                 System.out.println("Violaciones a la política de contraseña: " + error);
             }
+        } else {
+            System.out.println("FAILURE: Registro exitoso, pero se esperaba fallo por política de contraseña");
         }
-        else System.out.println("FAILURE: Registro exitoso, pero se esperaba fallo por política de contraseña");
     }    
 }

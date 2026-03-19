@@ -1,10 +1,6 @@
 package main.java.service;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 
 import main.java.model.Email;
 import main.java.model.HashedPassword;
@@ -17,17 +13,23 @@ public class AuthService {
         LinkedList<String> status = new LinkedList<>();
 
         status = validate(email, password);
-        if(status.size() > 0) return status; // validación fallida - pq si tiene valores status, son errores
+        if(status.size() > 0) {
+            return status; // validación fallida - pq si tiene valores status, son errores
+        }
         
         return status;
     }
 
     public LinkedList<String> register(String email, String password) {
-        if(currentUser != null) logout(); // desloguea al anterior
+        if(currentUser != null) {
+            logout(); // desloguea al anterior
+        }
 
         LinkedList<String> status = new LinkedList<>();
         status = validate(email, password);
-        if(status.size() > 0) return status;
+        if(status.size() > 0) {
+            return status;
+        }
 
         currentUser = convertCredentialsToUser(email, password);
         return status; // exito
@@ -39,10 +41,9 @@ public class AuthService {
 
     public LinkedList<String> validate(String email, String password) {
         LinkedList<String> errors = new LinkedList<>();
-        Email emailObj = null;
         HashedPassword hashedPasswordObj = null;
         try {
-            emailObj = new Email(email); // aquí hago validación de formato email
+            new Email(email); // aquí hago validación de formato email
         } catch (Exception e) {
             errors.add(e.getMessage());
         }
@@ -54,19 +55,24 @@ public class AuthService {
         }
 
         String emailName = email.contains("@") ? email.substring(0, email.indexOf("@")) : email;
-        if(password.length() < 8) 
+        if(password.length() < 8) {
             errors.add("La contraseña debe tener al menos 8 caracteres");
-        if(!password.matches(".*\\d.*")) 
+        }
+        if(!password.matches(".*\\d.*")) {
             errors.add("La contraseña debe tener al menos un número");
-        if(password.contains(emailName)) 
+        }
+        if(password.contains(emailName)) {
             errors.add("La contraseña no debe contener el nombre del correo");
+        }
 
         if (currentUser != null) { 
             // solo si hay usuario registrado, compara valores
-            if(!email.equals(currentUser.getEmail())) 
+            if(!email.equals(currentUser.getEmail())) {
                 errors.add("Correo incorrecto");
-            if(!hashedPasswordObj.getHashedPasswordString().equals(currentUser.getHashedPassword())) 
+            }
+            if(!hashedPasswordObj.getHashedPasswordString().equals(currentUser.getHashedPassword())) {
                 errors.add("Contraseña incorrecta");
+            }
         }
         
         return errors;
