@@ -1,4 +1,6 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.security.SecureRandom;
 
 public class AuthService {
@@ -15,7 +17,9 @@ public class AuthService {
         List<String> errors = new ArrayList<>();
         for (PasswordRule rule : rules) {
             String err = rule.validate(password, email);
-            if (err != null) errors.add(err);
+            if (err != null) {
+                errors.add(err);
+            }
         }
         return errors;
     }

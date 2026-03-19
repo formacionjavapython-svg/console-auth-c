@@ -8,14 +8,18 @@ class MinLengthRule implements PasswordRule {
     private final int min;
     public MinLengthRule(int min) { this.min = min; }
     public String validate(String password, String email) {
-        if (password == null || password.length() < min) return "Mínimo " + min + " caracteres.";
+        if (password == null || password.length() < min) {
+            return "Mínimo " + min + " caracteres.";
+        }
         return null;
     }
 }
 
 class ContainsNumberRule implements PasswordRule {
     public String validate(String password, String email) {
-        if (password == null || !password.matches(".*[0-9].*")) return "Debe incluir un numero.";
+        if (password == null || !password.matches(".*[0-9].*")) {
+            return "Debe incluir un numero.";
+        }
         return null;
     }
 }
