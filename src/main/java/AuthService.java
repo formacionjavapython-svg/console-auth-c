@@ -20,6 +20,11 @@ public class AuthService {
         return Base64.getEncoder().encodeToString(hash);
     }
 
+    public boolean verifyPassword(String inputPassword, String storedHash, byte[] salt) throws Exception {
+        String newHash = hashPassword(inputPassword, salt);
+        return newHash.equals(storedHash);
+    }
+
     public byte[] generateSalt() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
