@@ -3,11 +3,8 @@ import java.util.Optional;
 import rules.Email;
 import rules.PasswordPolicy;
 import rules.MinLengthRule;
-import rules.ContainsNumberRule;
-import rules.NoEmailInPasswordRule;
 
 public class AuthTest {
-
 
   public String testRegisterSuccess() {
     InMemoryUserRepository repo = new InMemoryUserRepository();
@@ -17,20 +14,18 @@ public class AuthTest {
     repo.save(user);
     Optional<User> found = repo.findByEmail(email);
     
-    return found.isPresent() ? "PASSED: Registro y Login exitoso" : "FAILED: El usuario no se guardo";
+    return found.isPresent() ? "PASSED: Registro exitoso" : "FAILED: No se guardo";
   }
 
-  
   public String testLoginFailure() {
     InMemoryUserRepository repo = new InMemoryUserRepository();
     Email email = new Email("pana@test.com");
     repo.save(new User(email, "secreta123"));
 
     Optional<User> user = repo.findByEmail(email);
-    
     boolean loginFallido = user.isPresent() && !user.get().getPasswordHash().equals("Error999");
 
-    return loginFallido ? "PASSED: Login fallo correctamente con password erroneo" : "FAILED: No detecto el password incorrecto";
+    return loginFallido ? "PASSED: Login fallo bien" : "FAILED: No detecto error";
   }
 
   public String testPolicyRejects() {
@@ -38,9 +33,8 @@ public class AuthTest {
     policy.addRule(new MinLengthRule(8));
     
     Email email = new Email("developer@test.mx");
-
     List<String> errors = policy.validate("123", email); 
 
-    return !errors.isEmpty() ? "PASSED: La política bloqueo correctamente el password corto" : "FAILED: La política permitio un password muy corto";
+    return !errors.isEmpty() ? "PASSED: Bloqueo corto" : "FAILED: Permitio corto";
   }
 }
