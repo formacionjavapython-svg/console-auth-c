@@ -1,0 +1,34 @@
+name: CI
+
+#se ejecuta en cada push o cuando abre un Pull Request
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      #descarga el codigo en la máquina virtual
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      #instala Java 17
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      #compilar el codigo y las pruebas
+      - name: Compilar con javac
+        run: |
+          mkdir -p out
+          javac -d out -cp src/main/java src/main/java/*.java src/main/java/rules/*.java src/test/java/*.java
+
+      #ejecutar los tests automatizados
+      - name: Ejecución de Tests
+        run: java -cp out TestRunner
+
+      #verificacion de Calidad (Checkstyle)
+      - name: Checkstyle Verification
+        run: java -jar checkstyle.jar -c checkstyle.xml src/
