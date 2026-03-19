@@ -1,35 +1,43 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.security.spec.KeySpec;
 import java.util.Base64;
-import java.util.regex.Pattern;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
 
 public class AuthService {
-    private static final String PEPPER = "Railway_System_2026"; 
-    private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[0-9]).{8,}$";
+    private List<PasswordRule> rules = new ArrayList<>();
+    private static final String PEPPER = "Railway_System_2026";
 
-    public boolean validatePasswordPolicy(String password) {
-        return Pattern.compile(PASSWORD_PATTERN).matcher(password).matches();
+    public AuthService() {
+        rules.add(new MinLengthRule());
+        rules.add(new ContainsNumberRule());
+        rules.add(new NoEmailInPasswordRule());
+    }
+
+    public List<String> validatePassword(String password, String email) {
+        List<String> violations = new ArrayList<>();
+        for (PasswordRule rule : rules) {
+            String error = rule.validate(password, email);
+            if (error != null) violations.add(error);
+        }
+        return violations;
     }
 
     public String hashPassword(String password, byte[] salt) throws Exception {
         KeySpec spec = new PBEKeySpec((password + PEPPER).toCharArray(), salt, 65536, 128);
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        byte[] hash = factory.generateSecret(spec).getEncoded();
-        return Base64.getEncoder().encodeToString(hash);
+        return Base64.getEncoder().encodeToString(factory.generateSecret(spec).getEncoded());
     }
 
-    // NUEVO: Método para verificar si la contraseña ingresada es correcta
-    public boolean verifyPassword(String inputPassword, String storedHash, byte[] salt) throws Exception {
-        String newHash = hashPassword(inputPassword, salt);
-        return newHash.equals(storedHash);
+    public boolean verifyPassword(String input, String stored, byte[] salt) throws Exception {
+        return hashPassword(input, salt).equals(stored);
     }
 
     public byte[] generateSalt() {
-        SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
-        random.nextBytes(salt);
+        new SecureRandom().nextBytes(salt);
         return salt;
     }
 }
