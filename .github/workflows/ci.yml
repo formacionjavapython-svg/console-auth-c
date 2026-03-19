@@ -9,7 +9,7 @@ jobs:
 
     steps:
       #descarga el codigo en la máquina virtual
-      - name: Checkout código
+      - name: Checkout codigo
         uses: actions/checkout@v3
 
       #instala Java 17
@@ -19,11 +19,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      #compilar el codigo y las pruebas
+      # compilar el codigo y las pruebas
       - name: Compilar con javac
         run: |
           mkdir -p out
-          javac -d out -cp src/main/java src/main/java/*.java src/main/java/rules/*.java src/test/java/*.java
+          javac -d out -cp src/main/java:src/test/java src/main/java/*.java src/main/java/rules/*.java src/test/java/*.java
 
       #ejecutar los tests automatizados
       - name: Ejecución de Tests
