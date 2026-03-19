@@ -25,4 +25,5 @@ jobs:
           curl -L -o checkstyle.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.12.4/checkstyle-10.12.4-all.jar
 
       - name: Ejecutar Checkstyle
-        run: java -jar checkstyle.jar -c checkstyle.xml src/main/java
+        run: find src/main/java -name "*.java" | xargs java -jar checkstyle.jar -c checkstyle.xml
+        
